@@ -4,7 +4,7 @@ use std::env;
 
 use crate::{
     args::{Formats, Modes},
-    tar_wrapper::extract_tar,
+    tar_wrapper::{compress_tar, extract_tar},
     zip_wrapper::{compress_zip, extract_zip},
 };
 
@@ -20,6 +20,7 @@ fn delegate_compress(args: &CliArgs, format: &Formats) {
     debug!("Mode: compress");
     match format {
         Formats::Zip => compress_zip(&args).unwrap(),
+        Formats::Tar => compress_tar(&args),
         _ => todo!(),
     };
 }
