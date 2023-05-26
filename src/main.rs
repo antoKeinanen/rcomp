@@ -2,7 +2,7 @@ use clap::Parser;
 use std::env;
 
 use crate::{
-    args::{Modes, ExtractFormats, CompressFormats, CliArgs},
+    args::{CliArgs, CompressFormats, ExtractFormats, Modes},
     tar_wrapper::{compress_tar, extract_tar},
     zip_wrapper::{compress_zip, extract_zip},
 };
@@ -19,7 +19,7 @@ fn autodetect_format(args: &CliArgs) {
     let path = args.path.clone();
     let extension = path.extension().unwrap().to_str().unwrap();
 
-    trace!("Autodetected extension as: {}", extension);;
+    trace!("Autodetected extension as: {}", extension);
 
     match extension.to_lowercase().as_str() {
         "zip" => extract_zip(args),
