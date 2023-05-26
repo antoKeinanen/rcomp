@@ -14,18 +14,33 @@ pub(crate) fn extract_tar(args: &CliArgs) {
     let file = File::open(&path).unwrap();
     let mut archive = Archive::new(file);
 
+    let dir = path.file_stem().unwrap();
+    let dir = PathBuf::from(&dir);
+
+    if dir.exists() {
+        if args.force {
+            info!(
+                "Directory \"{}\" already exists. Overriding!",
+                dir.to_str().unwrap()
+            );
+        } else {
+            error!(
+                "Directory \"{}\" already exists. Use -f flag to override.",
+                dir.to_str().unwrap()
+            );
+            panic!();
+        }
+    }
+
     let mut buffer = Vec::new();
     for file in archive.entries().unwrap() {
         let mut file = file.unwrap();
 
-        trace!(
-            "{:?} ({} bytes)",
-            file.header().path().unwrap(),
-            file.header().size().unwrap()
-        );
-
         let path = file.header().clone();
         let path = path.path().unwrap();
+        let path = dir.join(path);
+
+        trace!("{:?} ({} bytes)", path, file.header().size().unwrap());
 
         if file.header().entry_type().is_dir() {
             trace!("Extracting folder to {:?}", path);
@@ -53,6 +68,24 @@ pub(crate) fn compress_tar(args: &CliArgs) {
     let name = name.file_stem().unwrap().to_str().unwrap();
     let name = format!("{}.tar", name);
     info!("Creating archive: {name}");
+
+    let name = PathBuf::from(name);
+
+    if name.exists() {
+        trace!("{:?} already exists", name);
+        if args.force {
+            info!(
+                "File \"{}\" already exists. Overriding!",
+                name.to_str().unwrap()
+            );
+        } else {
+            error!(
+                "File \"{}\" already exists. Use -f flag to override.",
+                name.to_str().unwrap()
+            );
+            panic!();
+        }
+    }
 
     let file = File::create(name).unwrap();
     let mut archive = Builder::new(file);
