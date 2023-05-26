@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use tar::{Archive, Builder};
+use tar::{Archive, Builder, EntryType};
 use walkdir::WalkDir;
 
 use crate::args::CliArgs;
@@ -27,7 +27,7 @@ pub(crate) fn extract_tar(args: &CliArgs) {
         let path = file.header().clone();
         let path = path.path().unwrap();
 
-        if path.to_str().unwrap().ends_with("/") {
+        if file.header().entry_type().is_dir() {
             trace!("Extracting folder to {:?}", path);
             fs::create_dir_all(&path).unwrap();
         } else {
