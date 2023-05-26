@@ -4,10 +4,12 @@ use std::env;
 
 use crate::{
     args::{Formats, Modes},
+    tar_wrapper::extract_tar,
     zip_wrapper::{compress_zip, extract_zip},
 };
 
 mod args;
+mod tar_wrapper;
 mod zip_wrapper;
 
 extern crate pretty_env_logger;
@@ -26,6 +28,7 @@ fn delegate_extract(args: &CliArgs, format: &Formats) {
     debug!("Mode: extract");
     match format {
         Formats::Zip => extract_zip(args),
+        Formats::Tar => extract_tar(args),
         _ => todo!(),
     }
 }

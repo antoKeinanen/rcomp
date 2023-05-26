@@ -25,4 +25,5 @@ pub(crate) enum Modes {
 #[derive(Subcommand, Debug)]
 pub(crate) enum Formats {
     Zip,
+    Tar,
 }
