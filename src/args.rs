@@ -11,6 +11,8 @@ pub(crate) struct CliArgs {
     pub(crate) path: PathBuf,
     #[arg(short)]
     pub(crate) force: bool,
+    #[arg(long, default_value_t=3)]
+    pub(crate) log_level: u8,
 }
 
 #[derive(Subcommand, Debug)]

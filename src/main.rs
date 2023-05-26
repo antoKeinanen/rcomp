@@ -47,12 +47,28 @@ fn delegate_extract(args: &CliArgs, format: &ExtractFormats) {
     }
 }
 
+fn set_log_level(args: &CliArgs) {
+    match args.log_level {
+        0 => env::set_var("RUST_LOG", "off"),
+        1 => env::set_var("RUST_LOG", "error"),
+        2 => env::set_var("RUST_LOG", "warn"),
+        3 => env::set_var("RUST_LOG", "info"),
+        4 => env::set_var("RUST_LOG", "debug"),
+        5 => env::set_var("RUST_LOG", "trace"),
+        _ => warn!("Invalid log level: {}. Should be between 0-5", args.log_level)
+        
+    }
+}
+
 fn main() {
+    let cli_args = CliArgs::parse();
+    
     #[cfg(debug_assertions)]
     env::set_var("RUST_LOG", "TRACE");
+    
+    set_log_level(&cli_args);
 
     pretty_env_logger::init();
-    let cli_args = CliArgs::parse();
 
     trace!("{:?}", cli_args);
 
