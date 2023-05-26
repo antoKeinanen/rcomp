@@ -17,13 +17,20 @@ pub(crate) struct CliArgs {
 #[command(author, version, about, long_about=None)]
 pub(crate) enum Modes {
     #[command(subcommand)]
-    Extract(Formats),
+    Extract(ExtractFormats),
     #[command(subcommand)]
-    Compress(Formats),
+    Compress(CompressFormats),
 }
 
 #[derive(Subcommand, Debug)]
-pub(crate) enum Formats {
+pub(crate) enum ExtractFormats {
+    Zip,
+    Tar,
+    Auto,
+}
+
+#[derive(Subcommand, Debug)]
+pub(crate) enum CompressFormats {
     Zip,
     Tar,
 }
