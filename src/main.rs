@@ -44,7 +44,7 @@ fn main() {
     trace!("{:?}", cli_args);
 
     match cli_args.mode {
-        Modes::Extract { 0: ref format } => delegate_extract(&cli_args, &format),
-        Modes::Compress { 0: ref format } => delegate_compress(&cli_args, format),
+        Modes::Extract(ref format) => delegate_extract(&cli_args, &format),
+        Modes::Compress(ref format) => delegate_compress(&cli_args, format),
     }
 }
