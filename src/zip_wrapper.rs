@@ -1,4 +1,8 @@
-use std::{fs::{read_to_string, File, canonicalize, self}, path::{PathBuf, Path}, io::{Read, Write, self}};
+use std::{
+    fs::{self, canonicalize, read_to_string, File},
+    io::{self, Read, Write},
+    path::{Path, PathBuf},
+};
 
 use walkdir::WalkDir;
 use zip::{result::ZipResult, ZipArchive};
@@ -8,7 +12,7 @@ use crate::args::CliArgs;
 pub(crate) fn compress_zip(args: &CliArgs) -> ZipResult<()> {
     debug!("Format: zip");
     let path = args.path.clone();
-    
+
     if path.is_file() {
         trace!("{:?} is a file", path);
         let content = read_to_string(&path).unwrap();
@@ -20,10 +24,15 @@ pub(crate) fn compress_zip(args: &CliArgs) -> ZipResult<()> {
         if name.exists() {
             trace!("{:?} already exists", name);
             if args.force {
-                info!("File \"{}\" already exists. Overriding!", name.to_str().unwrap());
-            }
-            else {
-                error!("File \"{}\" already exists. Use -f flag to override.", name.to_str().unwrap());
+                info!(
+                    "File \"{}\" already exists. Overriding!",
+                    name.to_str().unwrap()
+                );
+            } else {
+                error!(
+                    "File \"{}\" already exists. Use -f flag to override.",
+                    name.to_str().unwrap()
+                );
                 panic!();
             }
         }
@@ -36,8 +45,7 @@ pub(crate) fn compress_zip(args: &CliArgs) -> ZipResult<()> {
 
         zip.finish()?;
         Ok(())
-    }
-    else if path.is_dir() {
+    } else if path.is_dir() {
         trace!("{:?} is a directory", path);
         let name = canonicalize(&path)?;
         trace!("Canonicalized path: {name:?}");
@@ -50,15 +58,20 @@ pub(crate) fn compress_zip(args: &CliArgs) -> ZipResult<()> {
         if name.exists() {
             trace!("{:?} already exists", name);
             if args.force {
-                info!("File \"{}\" already exists. Overriding!", name.to_str().unwrap());
-            }
-            else {
-                error!("File \"{}\" already exists. Use -f flag to override.", name.to_str().unwrap());
+                info!(
+                    "File \"{}\" already exists. Overriding!",
+                    name.to_str().unwrap()
+                );
+            } else {
+                error!(
+                    "File \"{}\" already exists. Use -f flag to override.",
+                    name.to_str().unwrap()
+                );
                 panic!();
             }
         }
 
-        let walkdir = WalkDir::new(&path).into_iter(); 
+        let walkdir = WalkDir::new(&path).into_iter();
 
         let file = File::create(PathBuf::from(&name)).unwrap();
         let mut zip = zip::ZipWriter::new(file);
@@ -78,8 +91,7 @@ pub(crate) fn compress_zip(args: &CliArgs) -> ZipResult<()> {
                 f.read_to_end(&mut buffer)?;
                 zip.write_all(&buffer)?;
                 buffer.clear();
-            }
-            else if !name.as_os_str().is_empty() {
+            } else if !name.as_os_str().is_empty() {
                 trace!("Adding dir {path:?} as {name:?} ...");
                 #[allow(deprecated)]
                 zip.add_directory_from_path(name, Default::default())?;
@@ -88,9 +100,11 @@ pub(crate) fn compress_zip(args: &CliArgs) -> ZipResult<()> {
 
         zip.finish()?;
         Ok(())
-    }
-    else {
-        error!("Path: {:?} is not a file or folder and thus not compressable!", path);
+    } else {
+        error!(
+            "Path: {:?} is not a file or folder and thus not compressable!",
+            path
+        );
         panic!();
     }
 }
@@ -98,7 +112,7 @@ pub(crate) fn compress_zip(args: &CliArgs) -> ZipResult<()> {
 pub(crate) fn extract_zip(args: &CliArgs) {
     debug!("Format: zip");
     let path = args.path.clone();
-    
+
     if !path.is_file() {
         error!("{} is not a file", path.to_str().unwrap());
         panic!();
@@ -110,10 +124,15 @@ pub(crate) fn extract_zip(args: &CliArgs) {
 
     if dir.exists() {
         if args.force {
-            info!("Directory \"{}\" already exists. Overriding!", dir.to_str().unwrap());
-        }
-        else {
-            error!("Directory \"{}\" already exists. Use -f flag to override.", dir.to_str().unwrap());
+            info!(
+                "Directory \"{}\" already exists. Overriding!",
+                dir.to_str().unwrap()
+            );
+        } else {
+            error!(
+                "Directory \"{}\" already exists. Use -f flag to override.",
+                dir.to_str().unwrap()
+            );
             panic!();
         }
     }
@@ -140,11 +159,10 @@ pub(crate) fn extract_zip(args: &CliArgs) {
             }
         }
 
-        if(*file.name()).ends_with('/') {
+        if (*file.name()).ends_with('/') {
             trace!("File {} extracted to \"{}\"", i, outpath.display());
             fs::create_dir_all(&outpath).unwrap();
-        }
-        else {
+        } else {
             trace!(
                 "File {} extracted to \"{}\" ({} bytes)",
                 i,
